@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link href="https://fonts.googleapis.com/css2?family=Sacramento&display=swap" rel="stylesheet">
+  <title>Secret Gallery</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #e0f7ff, #b3d1ff, #6699cc);
+      color: #444;
+    }
+
+    .screen {
+      display: none;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .active {
+      display: flex;
+    }
+
+    .password-screen {
+      flex-direction: column;
+      background-color: rgba(255,255,255,0.85);
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+
+    .input-display {
+      font-size: 28px;
+      margin: 15px 0;
+      letter-spacing: 8px;
+    }
+
+    .keypad {
+      display: grid;
+      grid-template-columns: repeat(3, 70px);
+      gap: 12px;
+      justify-content: center;
+    }
+
+    .key {
+      background: #b3d1ff;
+      border: none;
+      border-radius: 10px;
+      font-size: 20px;
+      padding: 15px;
+      cursor: pointer;
+      transition: transform 0.15s, background 0.2s;
+    }
+
+    .key:hover {
+      background: #99c2ff;
+      transform: scale(1.05);
+    }
+
+    .menu {
+      flex-direction: column;
+      gap: 20px;
+      animation: fadeIn 0.5s ease forwards;
+    }
+
+    h1 {
+      font-size: 2.2rem;
+      margin-bottom: 10px;
+      color: #336699;
+      text-shadow: 0 0 5px #fff, 0 0 10px #d6ecff;
+    }
+
+    .button-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+    }
+
+    .menu-button {
+      background: linear-gradient(135deg, #e0f7ff, #b3d1ff);
+      border: none;
+      border-radius: 15px;
+      padding: 15px 25px;
+      font-size: 18px;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .menu-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+    }
+
+    .image-screen {
+      flex-direction: column;
+      gap: 20px;
+      animation: fadeIn 0.5s ease forwards;
+    }
+
+    .image-screen img {
+      max-width: 90%;
+      max-height: 70vh;
+      border-radius: 15px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    }
+
+    .caption {
+      font-size: 1.6rem;
+      color: #336699;
+      margin-top: 10px;
+      font-family: 'Sacramento', cursive;
+      animation: fadeIn 1s ease forwards;
+    }
+
+    .back-button {
+      background: #b3d1ff;
+      border: none;
+      border-radius: 10px;
+      padding: 12px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .back-button:hover {
+      background: #99c2ff;
+    }
+
+    @keyframes fadeIn {
+      from {opacity:0; transform: translateY(20px);}
+      to {opacity:1; transform: translateY(0);}
+    }
+
+    .sparkle {
+      position: fixed;
+      width: 5px;
+      height: 5px;
+      background: #ffd700;
+      border-radius: 50%;
+      pointer-events: none;
+      box-shadow: 0 0 10px #fff, 0 0 20px #ff66a3, 0 0 30px #ffd6e8;
+      animation: sparkleMove 4s linear infinite;
+      z-index: 9999;
+    }
+
+    @keyframes sparkleMove {
+      0% { transform: translateY(0) scale(1); opacity: 1; }
+      100% { transform: translateY(-100vh) scale(0.5); opacity: 0; }
+    }
+
+    .heart {
+      position: fixed;
+      width: 20px;
+      height: 20px;
+      background: pink;
+      border-radius: 50% 50% 0 0;
+      transform: rotate(-45deg);
+      pointer-events: none;
+      animation: floatUp 1.5s ease-out forwards;
+      z-index: 9999;
+      box-shadow: 0 0 8px #ff66a3;
+    }
+
+    .heart::after,
+    .heart::before {
+      content: '';
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: pink;
+      border-radius: 50%;
+    }
+
+    .heart::before { top: -10px; left: 0; }
+    .heart::after { left: 10px; top: 0; }
+
+    @keyframes floatUp {
+      0% { transform: translateY(0) scale(1); opacity: 1; }
+      100% { transform: translateY(-100px) scale(1.5); opacity: 0; }
+    }
+
+    @keyframes buildLayer {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .candles {
+      display: flex;
+      gap: 12px;
+      position: absolute;
+      top: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+      opacity: 0;
+      animation: showCandles 0.5s forwards;
+      animation-delay: 2.6s;
+      z-index: 10;
+    }
+
+    @keyframes showCandles {
+      to { opacity: 1; }
+    }
+
+    .candle {
+      width: 10px;
+      height: 30px;
+      background: #ffcc99;
+      border-radius: 2px;
+      position: relative;
+    }
+
+    .flame {
+      position: absolute;
+      top: -18px;
+      left: 50%;
+      transform: translate(-50%, 0);
+      width: 10px;
+      height: 15px;
+      background: radial-gradient(circle, #ffcc00, #ff6600);
+      border-radius: 50%;
+      animation: flicker 0.3s infinite alternate;
+    }
+
+    @keyframes flicker {
+      0% { transform: scale(1); opacity: 1; }
+      100% { transform: scale(1.2); opacity: 0.8; }
+    }
+
+    .smoke-puff {
+      position: absolute;
+      top: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(160,160,160,0.6);
+      border-radius: 50%;
+      animation: smokeRise 2.5s ease-out forwards;
+    }
+
+    @keyframes smokeRise {
+      0% { transform: translateY(0) scale(1); opacity: 0.6; }
+      100% { transform: translateY(-40px) scale(1.8); opacity: 0; }
+    }
+
+    .handwritten {
+      font-family: 'Sacramento', cursive;
+      font-size: 1.8rem;
+      line-height: 1.6;
+      color: #444;
+      white-space: pre-wrap;
+    }
+
+    #typedMessage {
+      height: auto;
+      width: 600px;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    #typedText {
+      font-family: 'Sacramento', cursive;
+      font-size: 2.8rem;
+      color: #ff66a3;
+      white-space: pre-wrap;
+      text-align: center;
+      margin-bottom: 40px;
+      min-height: 80px;
+      opacity: 0;
+      transition: opacity 1s ease;
+    }
+    </style>
+</head>
+<body>
+  <!-- Password Screen -->
+  <div id="passwordScreen" class="screen password-screen active">
+    <h2>🔒 Enter Password</h2>
+    <div class="input-display" id="inputDisplay">••••</div>
+    <div class="keypad">
+      <button class="key" onclick="enterDigit('1')">1</button>
+      <button class="key" onclick="enterDigit('2')">2</button>
+      <button class="key" onclick="enterDigit('3')">3</button>
+      <button class="key" onclick="enterDigit('4')">4</button>
+      <button class="key" onclick="enterDigit('5')">5</button>
+      <button class="key" onclick="enterDigit('6')">6</button>
+      <button class="key" onclick="enterDigit('7')">7</button>
+      <button class="key" onclick="enterDigit('8')">8</button>
+      <button class="key" onclick="enterDigit('9')">9</button>
+      <div></div>
+      <button class="key" onclick="enterDigit('0')">0</button>
+      <div></div>
+    </div>
+  </div>
+
+  <!-- Main Menu Screen -->
+  <div id="menuScreen" class="screen menu">
+    <div style="background: #e0f7ff; padding: 10px; border-radius: 16px; box-shadow: 0 0 12px #b3d1ff;">
+      <iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/5TWLHD6l3LZCdieVqCkYJw?utm_source=generator" width="100%" height="152" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
+    </div>
+    <div>
+      <h1>🪷 Mi Galería de Cumpleaños 🪷</h1>
+      <p>Selecciona un botón para ver</p>
+    </div>
+    <div class="button-grid">
+      <button class="menu-button" onclick="openImage('msg1')">💌 Un Mensaje</button>
+      <button class="menu-button" onclick="openImage('cakeScreen')">🎂 Sorpresa de Pastel</button>
+      <button class="menu-button" onclick="openImage('img1')">🌌 Imagen 1</button>
+      <button class="menu-button" onclick="openImage('img2')">🌠 Imagen 2</button>
+      <button class="menu-button" onclick="openImage('img3')">🌙 Imagen 3</button>
+    </div>
+  </div>
+
+  <!-- Message Screen -->
+  <div id="msg1" class="screen image-screen">
+    <div style="max-width: 600px; background-color: rgba(255,255,255,0.85); padding: 30px; border-radius: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); overflow-y: auto; max-height: 80vh;">
+      <h2 style="color: #336699; font-size: 1.8rem; margin-bottom: 20px;">🎂 Feliz Cumpleaños, Josefina 🎂</h2>
+      <p id="typedMessage" class="handwritten"></p>
+      <button class="back-button" onclick="goBack()">Volver al Menú</button>
+    </div>
+  </div>
+
+<!-- Cake Screen -->
+<div id="cakeScreen" class="screen image-screen">
+  <h1 id="typedText"></h1>
+  <div class="cake" style="position: relative;">
+    <!-- Candles on top -->
+    <div class="candles">
+      <div class="candle"><div class="flame"></div></div>
+      <div class="candle"><div class="flame"></div></div>
+      <div class="candle"><div class="flame"></div></div>
+      <div class="candle"><div class="flame"></div></div>
+      <div class="candle"><div class="flame"></div></div>
+    </div>
+
+    <!-- Cake layers from top to bottom -->
+    <div class="layer layer1" style="background:#ff66b2; height:40px; width:100px; border-radius:12px; margin:auto; opacity:0; transform:translateY(20px); animation: buildLayer 0.5s forwards 2s;"></div>
+    <div class="layer layer2" style="background:#ff99cc; height:50px; width:140px; border-radius:12px; margin:auto; opacity:0; transform:translateY(20px); animation: buildLayer 0.5s forwards 1.5s;"></div>
+    <div class="layer layer3" style="background:#ffcce0; height:60px; width:180px; border-radius:12px; margin:auto; opacity:0; transform:translateY(20px); animation: buildLayer 0.5s forwards 1s;"></div>
+  </div>
+  <button class="back-button" onclick="goBack()">Volver al Menú</button>
+</div>
+
+  <!-- Image Screens -->
+  <div id="img1" class="screen image-screen">
+    <img src="placeholder1.jpg" alt="Imagen 1"/>
+    <div class="caption">siempre pensaré que eres mi alma gemela</div>
+    <button class="back-button" onclick="goBack()">Volver al Menú</button>
+  </div>
+
+  <div id="img2" class="screen image-screen">
+    <img src="placeholder2.jpg" alt="Imagen 2"/>
+    <div class="caption">siempre serás la primera en la que pienso cuando algo bueno pasa en mi vida</div>
+    <button class="back-button" onclick="goBack()">Volver al Menú</button>
+  </div>
+
+  <div id="img3" class="screen image-screen">
+    <img src="placeholder3.jpg" alt="Imagen 3"/>
+    <div class="caption">no importa lo que pase, siempre podrás confiar en mí, siempre estaré aquí para ti</div>
+    <button class="back-button" onclick="goBack()">Volver al Menú</button>
+  </div>
+  <script>
+    const correctPassword = '2510';
+    let input = '';
+
+    function enterDigit(digit) {
+      if (input.length < 4) input += digit;
+      document.getElementById('inputDisplay').textContent = input.padEnd(4, '•');
+      if (input.length === 4) {
+        if (input === correctPassword) {
+          showScreen('menuScreen');
+        } else {
+          alert('Incorrect password, try again');
+          input = '';
+          document.getElementById('inputDisplay').textContent = '••••';
+        }
+      }
+    }
+
+    function showScreen(id) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    }
+
+    function goBack() {
+      showScreen('menuScreen');
+    }
+
+    function createSparkle() {
+      const sparkle = document.createElement('div');
+      sparkle.className = 'sparkle';
+      sparkle.style.left = Math.random() * window.innerWidth + 'px';
+      sparkle.style.top = window.innerHeight + 'px';
+      document.body.appendChild(sparkle);
+      setTimeout(() => sparkle.remove(), 4000);
+    }
+
+    setInterval(createSparkle, 50);
+
+    function createHeart(x, y) {
+      const heart = document.createElement('div');
+      heart.className = 'heart';
+      heart.style.left = x + 'px';
+      heart.style.top = y + 'px';
+      document.body.appendChild(heart);
+      setTimeout(() => heart.remove(), 1500);
+    }
+
+    document.addEventListener('touchmove', e => {
+      for (let touch of e.touches) {
+        createHeart(touch.clientX, touch.clientY);
+      }
+    });
+
+    document.addEventListener('click', e => {
+      for (let i = 0; i < 8; i++) {
+        const offsetX = (Math.random() - 0.5) * 40;
+        const offsetY = (Math.random() - 0.5) * 40;
+        createHeart(e.clientX + offsetX, e.clientY + offsetY);
+      }
+    });
+
+    const messageText = `Te deseo muchas felicidades en tu cumpleaños. Perdón porque sé que no he sido la mejor amiga, pero me gustaría que sepas que siempre te voy a querer. 
+Cuando te conocí, no me caiste bien. Eras este tipo de persona habladora y sobresaliente y yo era todo lo contrario. Pero solo hice hablar contigo para cambiar de opinión. Eres una de las mejores personas que he conocido. Eres sobresaliente, super inteligente, trabajadora, resiliente, dedicada, y aunque la vida te trate de tumbar tú siempre te levantas. Si tuviera que describirte en una palabra, diría que eres; Sol. Tan cálida y brillante. Si no te hubiese conocido, ni si quiera quiero imaginar el rumbo por el que mi vida hubiese ido. Eres ese tipo de persona que uno tiene que mirar cuando entra a una habitación, tú siempre atraes todas las miradas, toda la atención. Eres así de genial. Estoy muy feliz de haberte conocido. Y aunque estemos distanciadas, aunque se me olvide mil veces tu cumpleaños, aunque casi no vea a tu niño, sólo quiero que sepas que todavía, y siempre, pienso en ti. Me hubiese gustado poder robarte para mí e irnos las dos por ahí a hacer una vida juntas, poder protegerte de todo lo malo. Pero a veces la vida no sale como uno quiere. Aún así, aquí estoy, ahora y siempre. Sólo puedo pedirte perdón y desear que consigas toda la felicidad que te mereces. 
+Te ama siempre,
+Elie.`;
+
+    let i = 0;
+
+    function typeMessage() {
+      if (i < messageText.length) {
+        document.getElementById("typedMessage").textContent += messageText.charAt(i);
+        i++;
+        setTimeout(typeMessage, 30);
+      }
+    }
+
+    function typeWriter() {
+      const cakeText = "🎉 Make a wish, Josefina 🎉";
+      let j = 0;
+      const typedText = document.getElementById("typedText");
+      typedText.style.opacity = 1;
+      function type() {
+        if (j < cakeText.length) {
+          typedText.textContent += cakeText.charAt(j);
+          j++;
+          setTimeout(type, 60);
+        }
+      }
+      type();
+    }
+
+    function startSmoke() {
+      const flames = document.querySelectorAll('.flame');
+      flames.forEach(flame => {
+        const puff = document.createElement('div');
+        puff.className = 'smoke-puff';
+        flame.appendChild(puff);
+        setTimeout(() => puff.remove(), 2500);
+      });
+    }
+
+    function openImage(imageId) {
+      showScreen(imageId);
+
+      if (imageId === 'msg1') {
+        const msgEl = document.getElementById("typedMessage");
+        if (msgEl) {
+          msgEl.textContent = '';
+          i = 0;
+          setTimeout(typeMessage, 300);
+        }
+      }
+
+      if (imageId === 'cakeScreen') {
+        const cakeEl = document.getElementById("typedText");
+        if (cakeEl) {
+          cakeEl.textContent = '';
+          setTimeout(typeWriter, 3200);
+          startSmoke();
+        }
+      }
+    }
+  </script>
+</body>
+</html>
